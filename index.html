@@ -135,7 +135,7 @@
             list.prepend(div);
         }
         function addNewFoodPrompt(name) {
-            const cal = prompt(`형님, '${name}'의 칼로리는?`);
+            const cal = prompt(`누님형님, '${name}'의 칼로리는?`);
             if(cal && !isNaN(cal)) {
                 const newFood = {name: name, cal: parseInt(cal)};
                 foodDB.push(newFood);
