@@ -11,7 +11,6 @@
         body { font-family: 'Pretendard', sans-serif; background-color: #f1f5f9; color: #1e293b; -webkit-tap-highlight-color: transparent; }
         .chan-doong-signature { font-family: 'Nanum Pen Script', cursive; font-size: 22px; color: #ef4444; transform: rotate(-10deg) translateY(6px); margin-right: 4px; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .food-card { transition: all 0.2s ease-out; }
     </style>
 </head>
 <body class="p-4 flex flex-col items-center min-h-screen pb-24">
@@ -32,11 +31,11 @@
     <div class="w-full max-w-sm bg-white rounded-3xl p-5 shadow-sm mb-6 border border-slate-200">
         <div class="relative mb-4">
             <i data-lucide="search" class="absolute left-3 top-3.5 w-4 h-4 text-slate-400"></i>
-            <input type="text" id="searchInput" onkeyup="searchFood()" placeholder="음식명 검색 (예: 삼겹살, 초코, 케밥)" 
+            <input type="text" id="searchInput" onkeyup="searchFood()" placeholder="음식/카테고리 검색 (예: 과자, 고기, 찌개)" 
                    class="w-full pl-10 p-3.5 border rounded-2xl text-sm bg-slate-50 outline-none focus:ring-2 focus:ring-rose-500 font-bold">
         </div>
         <div id="searchResult" class="flex gap-2 overflow-x-auto hide-scrollbar py-1 min-h-[44px]">
-            <p class="text-[11px] text-slate-400 p-2 font-bold italic tracking-tighter">데이터 120종 탑재 완료!</p>
+            <p class="text-[11px] text-slate-400 p-2 font-bold italic tracking-tighter">통합 카테고리 120종 탑재 완료!</p>
         </div>
     </div>
 
@@ -59,55 +58,44 @@
                 <i data-lucide="coffee" class="w-5 h-5"></i> 찬둥에게 커피 후원하기
             </a>
         </div>
-
         <div class="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
             <form action="https://www.coupang.com/np/search" method="get" target="_blank" class="flex gap-2">
                 <input type="hidden" name="channel" value="AF4757238">
-                <input type="text" name="q" placeholder="다이어트 식품 최저가 검색" class="flex-grow p-3 border rounded-xl text-sm bg-slate-50 outline-none text-black font-semibold">
+                <input type="text" name="q" placeholder="식단 보조제 최저가 검색" class="flex-grow p-3 border rounded-xl text-sm bg-slate-50 outline-none text-black font-semibold">
                 <button type="submit" class="bg-slate-800 text-white px-5 rounded-xl font-bold text-xs active:scale-95 transition">검색</button>
             </form>
             <p class="text-[9px] text-slate-400 mt-3 text-center leading-tight">"이 포스팅은 쿠팡 파트너스 활동의 일환으로 수수료를 제공받습니다."</p>
         </div>
     </div>
 
-    <button onclick="resetAll()" class="mb-12 text-slate-300 text-[10px] font-black uppercase tracking-[0.2em] hover:text-rose-500 transition">Reset Daily Record</button>
-
     <script>
-        // [기존 120종 데이터 및 로직 동일 생략... 아래 스크립트 그대로 사용]
-        let foodDB = [
-            {name: '떡볶이(1인분)', cal: 350}, {name: '치즈떡볶이', cal: 480}, {name: '라볶이', cal: 600}, {name: '로제떡볶이', cal: 700}, {name: '마라떡볶이', cal: 850},
-            {name: '김밥(1줄)', cal: 480}, {name: '참치김밥', cal: 550}, {name: '치즈김밥', cal: 520}, {name: '돈가스김밥', cal: 600}, {name: '멸치김밥', cal: 500},
-            {name: '순대(1인분)', cal: 400}, {name: '모둠튀김(1인분)', cal: 500}, {name: '오징어튀김(1개)', cal: 70}, {name: '김말이(1개)', cal: 65}, {name: '고구마튀김(1개)', cal: 90},
-            {name: '만두튀김(1개)', cal: 80}, {name: '어묵(1개)', cal: 100}, {name: '물만두(10개)', cal: 350}, {name: '찐만두(5개)', cal: 300}, {name: '쫄면', cal: 550},
-            {name: '비빔만두', cal: 600}, {name: '순대볶음', cal: 750}, {name: '핫도그', cal: 300}, {name: '소떡소떡', cal: 350},
-            // 🍛 한식 (Rice & Soup)
-            {name: '쌀밥', cal: 300}, {name: '현미밥', cal: 280}, {name: '김치찌개', cal: 250}, {name: '된장찌개', cal: 150}, {name: '순두부찌개', cal: 200}, {name: '삼계탕', cal: 900}, {name: '비빔밥', cal: 550}, {name: '불고기', cal: 350}, {name: '제육볶음', cal: 500}, {name: '갈비탕', cal: 450}, {name: '육개장', cal: 350}, {name: '미역국', cal: 80}, {name: '삼겹살(200g)', cal: 650}, {name: '소고기구이', cal: 400}, {name: '보쌈', cal: 800}, {name: '족발', cal: 900}, {name: '잡채', cal: 200}, {name: '김밥', cal: 480}, {name: '참치김밥', cal: 550},
-            // 🍜 면류 (Noodles)
-            {name: '라면', cal: 500}, {name: '불닭볶음면', cal: 530}, {name: '신라면', cal: 500}, {name: '진라면', cal: 500}, {name: '짜파게티', cal: 600}, {name: '냉면', cal: 450}, {name: '칼국수', cal: 600}, {name: '짬뽕', cal: 700}, {name: '짜장면', cal: 800}, {name: '우동', cal: 400}, {name: '파스타', cal: 650}, {name: '잔치국수', cal: 400},
-            // 🍗 양식 & 패스트푸드
-            {name: '치킨(1조각)', cal: 300}, {name: '후라이드치킨(한마리)', cal: 2500}, {name: '양념치킨(한마리)', cal: 2800}, {name: '피자(1조각)', cal: 300}, {name: '치즈버거', cal: 450}, {name: '빅맥', cal: 550}, {name: '와퍼', cal: 650}, {name: '샌드위치', cal: 350}, {name: '돈가스', cal: 700}, {name: '스테이크', cal: 600},
-            // 🍱 일식 & 중식
-            {name: '초밥(1피스)', cal: 50}, {name: '탕수육(소)', cal: 1200}, {name: '마라탕(1그릇)', cal: 800}, {name: '꿔바로우', cal: 700}, {name: '회덮밥', cal: 450},
-            // 🍪 과자류 (Snacks)
-            {name: '새우깡', cal: 450}, {name: '포카칩', cal: 330}, {name: '홈런볼', cal: 270}, {name: '꼬북칩', cal: 430}, {name: '프링글스', cal: 530}, {name: '에이스', cal: 600}, {name: '오징어땅콩', cal: 500}, {name: '허니버터칩', cal: 345}, {name: '초코파이', cal: 170}, {name: '몽쉘', cal: 165}, {name: '오예스', cal: 150}, {name: '다이제', cal: 1000},
-            // 🍫 초콜릿 & 캔디
-            {name: '가나초콜릿', cal: 390}, {name: '스니커즈', cal: 250}, {name: '트위스트', cal: 240}, {name: '키세스(1알)', cal: 25}, {name: '페레로로쉐(1알)', cal: 75}, {name: '킨더조이', cal: 110}, {name: '자유시간', cal: 230}, {name: '마이삥(1봉)', cal: 200},
-            // 🍦 아이스크림 (Dessert)
-            {name: '메로나', cal: 120}, {name: '월드콘', cal: 250}, {name: '부라보콘', cal: 240}, {name: '붕어싸만코', cal: 210}, {name: '설레임', cal: 160}, {name: '돼지바', cal: 170}, {name: '비비빅', cal: 135}, {name: '누가바', cal: 140}, {name: '베스킨라빈스(싱글)', cal: 250}, {name: '투게더(1통)', cal: 900}, {name: '하겐다즈(파인트)', cal: 1000},
-            // ☕ 음료 & 주류
-            {name: '아메리카노', cal: 10}, {name: '카페라떼', cal: 150}, {name: '콜라(355ml)', cal: 150}, {name: '제로콜라', cal: 0}, {name: '사이다', cal: 140}, {name: '오렌지주스', cal: 120}, {name: '우유(200ml)', cal: 130}, {name: '소주(1병)', cal: 400}, {name: '맥주(500ml)', cal: 200}, {name: '막걸리', cal: 350}, {name: '레드와인(1잔)', cal: 100},
-            // 🥙 터키 & 기타 (Didim Life)
-            {name: '케밥', cal: 600}, {name: '피데', cal: 450}, {name: '시미트', cal: 300}, {name: '계란후라이', cal: 90}, {name: '삶은계란', cal: 75}, {name: '사과', cal: 50}, {name: '바나나', cal: 90}, {name: '고구마', cal: 130}, {name: '감자', cal: 80}, {name: '닭가슴살(100g)', cal: 110}, {name: '샐러드', cal: 100}
+        // 🍔 찬둥 형님의 지시대로 통합된 120종 마스터 데이터
+        const foodDB = [
+            // 🍚 밥/죽류 (15)
+            {name: '흰쌀밥', cal: 300}, {name: '잡곡밥', cal: 320}, {name: '볶음밥', cal: 600}, {name: '김밥', cal: 480}, {name: '삼각김밥', cal: 200}, {name: '죽(쇠고기)', cal: 250}, {name: '야채죽', cal: 180}, {name: '비빔밥', cal: 550}, {name: '덮밥(제육)', cal: 650}, {name: '덮밥(불고기)', cal: 600}, {name: '회덮밥', cal: 500}, {name: '초밥(10p)', cal: 500}, {name: '오므라이스', cal: 700}, {name: '카레라이스', cal: 550}, {name: '하이라이스', cal: 550},
+            // 🍜 면류 (15)
+            {name: '라면', cal: 500}, {name: '비빔면', cal: 530}, {name: '짜장면', cal: 800}, {name: '짬뽕', cal: 700}, {name: '칼국수', cal: 600}, {name: '잔치국수', cal: 400}, {name: '냉면', cal: 500}, {name: '쫄면', cal: 550}, {name: '우동', cal: 400}, {name: '파스타(크림)', cal: 800}, {name: '파스타(토마토)', cal: 500}, {name: '메밀소바', cal: 350}, {name: '쌀국수', cal: 350}, {name: '마라탕', cal: 800}, {name: '비빔국수', cal: 450},
+            // 🍲 국/찌개류 (15)
+            {name: '김치찌개', cal: 250}, {name: '된장찌개', cal: 200}, {name: '부대찌개', cal: 500}, {name: '순두부찌개', cal: 250}, {name: '청국장', cal: 300}, {name: '미역국', cal: 100}, {name: '콩나물국', cal: 50}, {name: '육개장', cal: 350}, {name: '갈비탕', cal: 450}, {name: '삼계탕', cal: 900}, {name: '설렁탕', cal: 400}, {name: '추어탕', cal: 350}, {name: '감자탕', cal: 600}, {name: '매운탕', cal: 300}, {name: '국밥(돼지)', cal: 600},
+            // 🍖 고기류 (15)
+            {name: '삼겹살(200g)', cal: 650}, {name: '돼지갈비(200g)', cal: 500}, {name: '소고기구이', cal: 400}, {name: '닭가슴살(100g)', cal: 110}, {name: '스테이크', cal: 600}, {name: '보쌈(1인분)', cal: 800}, {name: '족발(1인분)', cal: 900}, {name: '훈제오리', cal: 500}, {name: '불고기', cal: 350}, {name: '닭볶음탕', cal: 600}, {name: '오리주물럭', cal: 600}, {name: '소시지구이', cal: 300}, {name: '베이컨', cal: 250}, {name: '햄버그스테이크', cal: 500}, {name: '곱창구이', cal: 700},
+            // 🍗 패스트푸드 (10)
+            {name: '치킨(후라이드)', cal: 2500}, {name: '치킨(양념)', cal: 2800}, {name: '피자(L한판)', cal: 2400}, {name: '햄버거(단품)', cal: 500}, {name: '감자튀김(M)', cal: 350}, {name: '샌드위치', cal: 400}, {name: '돈가스', cal: 700}, {name: '생선까스', cal: 600}, {name: '핫도그', cal: 300}, {name: '타코/브리또', cal: 500},
+            // 🍤 분식류 (10)
+            {name: '떡볶이(1인분)', cal: 400}, {name: '순대', cal: 400}, {name: '튀김(모듬)', cal: 500}, {name: '어묵(2개)', cal: 200}, {name: '만두(5개)', cal: 350}, {name: '순대볶음', cal: 700}, {name: '라볶이', cal: 600}, {name: '계란말이', cal: 300}, {name: '파전/부침개', cal: 500}, {name: '핫바', cal: 250},
+            // 🍪 과자/디저트 (10) - 형님 요청대로 통합
+            {name: '과자(한봉지)', cal: 450}, {name: '초콜릿', cal: 500}, {name: '캔디/사탕', cal: 100}, {name: '껌(1통)', cal: 30}, {name: '쿠키/비스킷', cal: 300}, {name: '케이크(1조각)', cal: 400}, {name: '도넛(1개)', cal: 250}, {name: '빵(단팥빵 등)', cal: 300}, {name: '머핀', cal: 350}, {name: '마카롱', cal: 150},
+            // 🍦 아이스크림/유제품 (10)
+            {name: '아이스크림(바)', cal: 150}, {name: '아이스크림(콘)', cal: 250}, {name: '아이스크림(통)', cal: 900}, {name: '우유(200ml)', cal: 130}, {name: '요거트', cal: 100}, {name: '치즈(1장)', cal: 60}, {name: '두유', cal: 120}, {name: '버터', cal: 100}, {name: '생크림', cal: 200}, {name: '요구르트', cal: 50},
+            // 🥤 음료/주류 (10)
+            {name: '탄산음료', cal: 150}, {name: '제로탄산', cal: 0}, {name: '아메리카노', cal: 10}, {name: '카페라떼', cal: 150}, {name: '과일주스', cal: 120}, {name: '에너지드링크', cal: 100}, {name: '소주(1병)', cal: 400}, {name: '맥주(500ml)', cal: 200}, {name: '막걸리', cal: 350}, {name: '와인/양주(잔)', cal: 100},
+            // 🍎 과일/채소 (10)
+            {name: '사과', cal: 50}, {name: '바나나', cal: 90}, {name: '수박/멜론', cal: 100}, {name: '포도/귤', cal: 60}, {name: '샐러드', cal: 150}, {name: '고구마', cal: 130}, {name: '감자', cal: 80}, {name: '토마토', cal: 30}, {name: '딸기/블루베리', cal: 50}, {name: '견과류(한줌)', cal: 150}
         ];
 
-        // [이하 searchFood, confirmAdd, resetAll 등 모든 로직 유지]
         let totalCals = 0;
         let selectedFood = null;
-        const savedDB = localStorage.getItem('chan_food_db');
-        if(savedDB) {
-            const parsed = JSON.parse(savedDB);
-            parsed.forEach(f => { if(!foodDB.find(item => item.name === f.name)) foodDB.push(f); });
-        }
+
         function searchFood() {
             const input = document.getElementById('searchInput').value.trim();
             const resultDiv = document.getElementById('searchResult');
@@ -115,7 +103,7 @@
             if(!input) return;
             const filtered = foodDB.filter(f => f.name.includes(input));
             if(filtered.length === 0) {
-                resultDiv.innerHTML = `<button onclick="addNewFoodPrompt('${input}')" class="text-xs bg-slate-800 text-white px-5 py-2.5 rounded-full font-black italic shadow-md">+ '${input}' NEW</button>`;
+                resultDiv.innerHTML = `<button onclick="addNewFoodPrompt('${input}')" class="text-xs bg-slate-800 text-white px-5 py-2.5 rounded-full font-black italic shadow-md">+ '${input}' 등록</button>`;
                 return;
             }
             filtered.forEach(f => {
@@ -126,13 +114,15 @@
                 resultDiv.appendChild(btn);
             });
         }
+
         function selectFood(food) {
             selectedFood = food;
             document.getElementById('addSection').classList.remove('hidden');
             document.getElementById('selectedName').innerText = food.name;
-            document.getElementById('selectedUnitCal').innerText = `${food.cal} Kcal / Unit`;
-            window.scrollTo({ top: 200, behavior: 'smooth' });
+            document.getElementById('selectedUnitCal').innerText = `${food.cal} Kcal 기준`;
+            window.scrollTo({ top: 150, behavior: 'smooth' });
         }
+
         function confirmAdd() {
             const amount = parseFloat(document.getElementById('amount').value);
             const total = Math.round(selectedFood.cal * amount);
@@ -142,30 +132,25 @@
             document.getElementById('addSection').classList.add('hidden');
             document.getElementById('searchInput').value = '';
             document.getElementById('searchResult').innerHTML = '';
+            document.getElementById('amount').value = '1';
         }
+
         function addHistoryUI(name, total, amount) {
             const list = document.getElementById('historyList');
             const div = document.createElement('div');
-            div.className = "flex justify-between items-center bg-white p-5 rounded-[1.5rem] border-l-[6px] border-l-rose-500 shadow-sm food-card animate-in slide-in-from-bottom-3 duration-300";
+            div.className = "flex justify-between items-center bg-white p-5 rounded-[1.5rem] border-l-[6px] border-l-rose-500 shadow-sm animate-in slide-in-from-bottom-3 duration-300";
             div.innerHTML = `<div><p class="font-black text-slate-800 italic uppercase text-lg tracking-tighter">${name}</p>
-                <p class="text-[9px] text-slate-400 font-black tracking-widest uppercase">${amount} servings</p></div>
+                <p class="text-[9px] text-slate-400 font-black tracking-widest uppercase">${amount} 개/인분</p></div>
                 <div class="text-right"><p class="text-rose-500 font-black italic text-2xl tracking-tighter">${total.toLocaleString()}</p>
-                <button onclick="this.parentElement.parentElement.remove(); totalCals-=${total}; updateDisplay();" class="text-[8px] text-slate-300 font-black uppercase">Remove</button></div>`;
+                <button onclick="this.parentElement.parentElement.remove(); totalCals-=${total}; updateDisplay();" class="text-[8px] text-slate-300 font-black uppercase tracking-widest">Delete</button></div>`;
             list.prepend(div);
         }
-        function addNewFoodPrompt(name) {
-            const cal = prompt(`누님형님, '${name}'의 칼로리는?`);
-            if(cal && !isNaN(cal)) {
-                const newFood = {name: name, cal: parseInt(cal)};
-                foodDB.push(newFood);
-                localStorage.setItem('chan_food_db', JSON.stringify(foodDB));
-                selectFood(newFood);
-            }
-        }
+
         function updateDisplay() {
             document.getElementById('totalDisplay').innerText = totalCals.toLocaleString();
             lucide.createIcons();
         }
+
         function resetAll() { if(confirm("초기화할까요?")) location.reload(); }
         lucide.createIcons();
     </script>
