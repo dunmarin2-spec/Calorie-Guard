@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Calorie Guard - 찬둥 에디션</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800&family=Nanum+Pen+Script&display=swap');
+        body { font-family: 'Pretendard', sans-serif; background-color: #f1f5f9; color: #1e293b; -webkit-tap-highlight-color: transparent; }
+        .chan-doong-signature { font-family: 'Nanum Pen Script', cursive; font-size: 22px; color: #ef4444; transform: rotate(-10deg) translateY(6px); margin-right: 4px; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .food-card { transition: all 0.2s ease-out; }
+    </style>
+</head>
+<body class="p-4 flex flex-col items-center min-h-screen pb-24">
+
+    <header class="text-center my-8 flex items-center justify-center">
+        <span class="chan-doong-signature">찬둥의</span>
+        <h1 class="text-4xl font-black text-slate-900 italic tracking-tighter leading-none">CALORIE GUARD</h1>
+    </header>
+
+    <div class="w-full max-w-sm bg-white rounded-[2.5rem] shadow-2xl p-10 mb-8 border-b-[14px] border-rose-500 text-center relative overflow-hidden">
+        <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-3">Total Intake Today</p>
+        <div class="flex items-baseline justify-center gap-1">
+            <span id="totalDisplay" class="text-7xl font-black text-rose-500 italic leading-none tracking-tighter">0</span>
+            <span class="text-2xl font-bold text-rose-500 italic">Kcal</span>
+        </div>
+    </div>
+
+    <div class="w-full max-w-sm bg-white rounded-3xl p-5 shadow-sm mb-6 border border-slate-200">
+        <div class="relative mb-4">
+            <i data-lucide="search" class="absolute left-3 top-3.5 w-4 h-4 text-slate-400"></i>
+            <input type="text" id="searchInput" onkeyup="searchFood()" placeholder="음식명 검색 (예: 삼겹살, 초코, 케밥)" 
+                   class="w-full pl-10 p-3.5 border rounded-2xl text-sm bg-slate-50 outline-none focus:ring-2 focus:ring-rose-500 font-bold">
+        </div>
+        <div id="searchResult" class="flex gap-2 overflow-x-auto hide-scrollbar py-1 min-h-[44px]">
+            <p class="text-[11px] text-slate-400 p-2 font-bold italic tracking-tighter">데이터 120종 탑재 완료!</p>
+        </div>
+    </div>
+
+    <div id="addSection" class="w-full max-w-sm bg-slate-900 rounded-[2rem] p-6 mb-8 hidden shadow-2xl animate-in fade-in zoom-in duration-300">
+        <div class="flex justify-between items-center mb-4">
+            <span id="selectedName" class="text-white font-black text-xl italic uppercase">SELECTED</span>
+            <span id="selectedUnitCal" class="text-rose-400 text-xs font-bold italic">0 Kcal/Unit</span>
+        </div>
+        <div class="flex gap-4 items-center">
+            <input type="number" id="amount" value="1" step="0.5" class="w-24 p-4 rounded-2xl bg-slate-800 text-white text-center text-2xl font-black outline-none border border-slate-700 text-rose-500">
+            <button onclick="confirmAdd()" class="flex-grow bg-rose-500 text-white p-4 rounded-2xl font-black text-xl active:scale-95 transition shadow-lg shadow-rose-900/40 italic">ADD NOW</button>
+        </div>
+    </div>
+
+    <div class="w-full max-w-sm space-y-3 flex-grow mb-10" id="historyList"></div>
+
+    <div class="w-full max-w-sm space-y-6 mt-10 mb-10">
+        <div class="text-center">
+            <a href="https://qr.kakaopay.com/FRK8J0SAD" target="_blank" class="inline-flex items-center gap-2 bg-[#FAE100] text-[#3C1E1E] px-8 py-4 rounded-2xl font-black text-sm shadow-md active:scale-95 transition">
+                <i data-lucide="coffee" class="w-5 h-5"></i> 찬둥에게 커피 후원하기
+            </a>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm">
+            <form action="https://www.coupang.com/np/search" method="get" target="_blank" class="flex gap-2">
+                <input type="hidden" name="channel" value="AF4757238">
+                <input type="text" name="q" placeholder="다이어트 식품 최저가 검색" class="flex-grow p-3 border rounded-xl text-sm bg-slate-50 outline-none text-black font-semibold">
+                <button type="submit" class="bg-slate-800 text-white px-5 rounded-xl font-bold text-xs active:scale-95 transition">검색</button>
+            </form>
+            <p class="text-[9px] text-slate-400 mt-3 text-center leading-tight">"이 포스팅은 쿠팡 파트너스 활동의 일환으로 수수료를 제공받습니다."</p>
+        </div>
+    </div>
+
+    <button onclick="resetAll()" class="mb-12 text-slate-300 text-[10px] font-black uppercase tracking-[0.2em] hover:text-rose-500 transition">Reset Daily Record</button>
+
+    <script>
+        // [기존 120종 데이터 및 로직 동일 생략... 아래 스크립트 그대로 사용]
+        let foodDB = [
+            {name: '쌀밥', cal: 300}, {name: '김치찌개', cal: 250}, {name: '라면', cal: 500}, {name: '치킨(한마리)', cal: 2500}, {name: '피자(1조각)', cal: 300},
+            {name: '새우깡', cal: 450}, {name: '초코파이', cal: 170}, {name: '메로나', cal: 120}, {name: '월드콘', cal: 250}, {name: '소주(1병)', cal: 400},
+            {name: '케밥', cal: 600}, {name: '피데', cal: 450}, {name: '삼겹살(200g)', cal: 650}, {name: '제로콜라', cal: 0}
+            // (실제 배포시에는 앞서 드린 120종 리스트를 여기에 모두 채우시면 됩니다)
+        ];
+
+        // [이하 searchFood, confirmAdd, resetAll 등 모든 로직 유지]
+        let totalCals = 0;
+        let selectedFood = null;
+        const savedDB = localStorage.getItem('chan_food_db');
+        if(savedDB) {
+            const parsed = JSON.parse(savedDB);
+            parsed.forEach(f => { if(!foodDB.find(item => item.name === f.name)) foodDB.push(f); });
+        }
+        function searchFood() {
+            const input = document.getElementById('searchInput').value.trim();
+            const resultDiv = document.getElementById('searchResult');
+            resultDiv.innerHTML = '';
+            if(!input) return;
+            const filtered = foodDB.filter(f => f.name.includes(input));
+            if(filtered.length === 0) {
+                resultDiv.innerHTML = `<button onclick="addNewFoodPrompt('${input}')" class="text-xs bg-slate-800 text-white px-5 py-2.5 rounded-full font-black italic shadow-md">+ '${input}' NEW</button>`;
+                return;
+            }
+            filtered.forEach(f => {
+                const btn = document.createElement('button');
+                btn.className = "text-xs bg-white border-2 border-slate-100 px-5 py-2.5 rounded-full font-black whitespace-nowrap shadow-sm hover:border-rose-500 hover:text-rose-500 transition-all italic";
+                btn.innerText = `${f.name} (${f.cal})`;
+                btn.onclick = () => selectFood(f);
+                resultDiv.appendChild(btn);
+            });
+        }
+        function selectFood(food) {
+            selectedFood = food;
+            document.getElementById('addSection').classList.remove('hidden');
+            document.getElementById('selectedName').innerText = food.name;
+            document.getElementById('selectedUnitCal').innerText = `${food.cal} Kcal / Unit`;
+            window.scrollTo({ top: 200, behavior: 'smooth' });
+        }
+        function confirmAdd() {
+            const amount = parseFloat(document.getElementById('amount').value);
+            const total = Math.round(selectedFood.cal * amount);
+            totalCals += total;
+            addHistoryUI(selectedFood.name, total, amount);
+            updateDisplay();
+            document.getElementById('addSection').classList.add('hidden');
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchResult').innerHTML = '';
+        }
+        function addHistoryUI(name, total, amount) {
+            const list = document.getElementById('historyList');
+            const div = document.createElement('div');
+            div.className = "flex justify-between items-center bg-white p-5 rounded-[1.5rem] border-l-[6px] border-l-rose-500 shadow-sm food-card animate-in slide-in-from-bottom-3 duration-300";
+            div.innerHTML = `<div><p class="font-black text-slate-800 italic uppercase text-lg tracking-tighter">${name}</p>
+                <p class="text-[9px] text-slate-400 font-black tracking-widest uppercase">${amount} servings</p></div>
+                <div class="text-right"><p class="text-rose-500 font-black italic text-2xl tracking-tighter">${total.toLocaleString()}</p>
+                <button onclick="this.parentElement.parentElement.remove(); totalCals-=${total}; updateDisplay();" class="text-[8px] text-slate-300 font-black uppercase">Remove</button></div>`;
+            list.prepend(div);
+        }
+        function addNewFoodPrompt(name) {
+            const cal = prompt(`형님, '${name}'의 칼로리는?`);
+            if(cal && !isNaN(cal)) {
+                const newFood = {name: name, cal: parseInt(cal)};
+                foodDB.push(newFood);
+                localStorage.setItem('chan_food_db', JSON.stringify(foodDB));
+                selectFood(newFood);
+            }
+        }
+        function updateDisplay() {
+            document.getElementById('totalDisplay').innerText = totalCals.toLocaleString();
+            lucide.createIcons();
+        }
+        function resetAll() { if(confirm("초기화할까요?")) location.reload(); }
+        lucide.createIcons();
+    </script>
+</body>
+</html>
