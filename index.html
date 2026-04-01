@@ -75,10 +75,29 @@
     <script>
         // [기존 120종 데이터 및 로직 동일 생략... 아래 스크립트 그대로 사용]
         let foodDB = [
-            {name: '쌀밥', cal: 300}, {name: '김치찌개', cal: 250}, {name: '라면', cal: 500}, {name: '치킨(한마리)', cal: 2500}, {name: '피자(1조각)', cal: 300},
-            {name: '새우깡', cal: 450}, {name: '초코파이', cal: 170}, {name: '메로나', cal: 120}, {name: '월드콘', cal: 250}, {name: '소주(1병)', cal: 400},
-            {name: '케밥', cal: 600}, {name: '피데', cal: 450}, {name: '삼겹살(200g)', cal: 650}, {name: '제로콜라', cal: 0}
-            // (실제 배포시에는 앞서 드린 120종 리스트를 여기에 모두 채우시면 됩니다)
+            {name: '떡볶이(1인분)', cal: 350}, {name: '치즈떡볶이', cal: 480}, {name: '라볶이', cal: 600}, {name: '로제떡볶이', cal: 700}, {name: '마라떡볶이', cal: 850},
+            {name: '김밥(1줄)', cal: 480}, {name: '참치김밥', cal: 550}, {name: '치즈김밥', cal: 520}, {name: '돈가스김밥', cal: 600}, {name: '멸치김밥', cal: 500},
+            {name: '순대(1인분)', cal: 400}, {name: '모둠튀김(1인분)', cal: 500}, {name: '오징어튀김(1개)', cal: 70}, {name: '김말이(1개)', cal: 65}, {name: '고구마튀김(1개)', cal: 90},
+            {name: '만두튀김(1개)', cal: 80}, {name: '어묵(1개)', cal: 100}, {name: '물만두(10개)', cal: 350}, {name: '찐만두(5개)', cal: 300}, {name: '쫄면', cal: 550},
+            {name: '비빔만두', cal: 600}, {name: '순대볶음', cal: 750}, {name: '핫도그', cal: 300}, {name: '소떡소떡', cal: 350},
+            // 🍛 한식 (Rice & Soup)
+            {name: '쌀밥', cal: 300}, {name: '현미밥', cal: 280}, {name: '김치찌개', cal: 250}, {name: '된장찌개', cal: 150}, {name: '순두부찌개', cal: 200}, {name: '삼계탕', cal: 900}, {name: '비빔밥', cal: 550}, {name: '불고기', cal: 350}, {name: '제육볶음', cal: 500}, {name: '갈비탕', cal: 450}, {name: '육개장', cal: 350}, {name: '미역국', cal: 80}, {name: '삼겹살(200g)', cal: 650}, {name: '소고기구이', cal: 400}, {name: '보쌈', cal: 800}, {name: '족발', cal: 900}, {name: '잡채', cal: 200}, {name: '김밥', cal: 480}, {name: '참치김밥', cal: 550},
+            // 🍜 면류 (Noodles)
+            {name: '라면', cal: 500}, {name: '불닭볶음면', cal: 530}, {name: '신라면', cal: 500}, {name: '진라면', cal: 500}, {name: '짜파게티', cal: 600}, {name: '냉면', cal: 450}, {name: '칼국수', cal: 600}, {name: '짬뽕', cal: 700}, {name: '짜장면', cal: 800}, {name: '우동', cal: 400}, {name: '파스타', cal: 650}, {name: '잔치국수', cal: 400},
+            // 🍗 양식 & 패스트푸드
+            {name: '치킨(1조각)', cal: 300}, {name: '후라이드치킨(한마리)', cal: 2500}, {name: '양념치킨(한마리)', cal: 2800}, {name: '피자(1조각)', cal: 300}, {name: '치즈버거', cal: 450}, {name: '빅맥', cal: 550}, {name: '와퍼', cal: 650}, {name: '샌드위치', cal: 350}, {name: '돈가스', cal: 700}, {name: '스테이크', cal: 600},
+            // 🍱 일식 & 중식
+            {name: '초밥(1피스)', cal: 50}, {name: '탕수육(소)', cal: 1200}, {name: '마라탕(1그릇)', cal: 800}, {name: '꿔바로우', cal: 700}, {name: '회덮밥', cal: 450},
+            // 🍪 과자류 (Snacks)
+            {name: '새우깡', cal: 450}, {name: '포카칩', cal: 330}, {name: '홈런볼', cal: 270}, {name: '꼬북칩', cal: 430}, {name: '프링글스', cal: 530}, {name: '에이스', cal: 600}, {name: '오징어땅콩', cal: 500}, {name: '허니버터칩', cal: 345}, {name: '초코파이', cal: 170}, {name: '몽쉘', cal: 165}, {name: '오예스', cal: 150}, {name: '다이제', cal: 1000},
+            // 🍫 초콜릿 & 캔디
+            {name: '가나초콜릿', cal: 390}, {name: '스니커즈', cal: 250}, {name: '트위스트', cal: 240}, {name: '키세스(1알)', cal: 25}, {name: '페레로로쉐(1알)', cal: 75}, {name: '킨더조이', cal: 110}, {name: '자유시간', cal: 230}, {name: '마이삥(1봉)', cal: 200},
+            // 🍦 아이스크림 (Dessert)
+            {name: '메로나', cal: 120}, {name: '월드콘', cal: 250}, {name: '부라보콘', cal: 240}, {name: '붕어싸만코', cal: 210}, {name: '설레임', cal: 160}, {name: '돼지바', cal: 170}, {name: '비비빅', cal: 135}, {name: '누가바', cal: 140}, {name: '베스킨라빈스(싱글)', cal: 250}, {name: '투게더(1통)', cal: 900}, {name: '하겐다즈(파인트)', cal: 1000},
+            // ☕ 음료 & 주류
+            {name: '아메리카노', cal: 10}, {name: '카페라떼', cal: 150}, {name: '콜라(355ml)', cal: 150}, {name: '제로콜라', cal: 0}, {name: '사이다', cal: 140}, {name: '오렌지주스', cal: 120}, {name: '우유(200ml)', cal: 130}, {name: '소주(1병)', cal: 400}, {name: '맥주(500ml)', cal: 200}, {name: '막걸리', cal: 350}, {name: '레드와인(1잔)', cal: 100},
+            // 🥙 터키 & 기타 (Didim Life)
+            {name: '케밥', cal: 600}, {name: '피데', cal: 450}, {name: '시미트', cal: 300}, {name: '계란후라이', cal: 90}, {name: '삶은계란', cal: 75}, {name: '사과', cal: 50}, {name: '바나나', cal: 90}, {name: '고구마', cal: 130}, {name: '감자', cal: 80}, {name: '닭가슴살(100g)', cal: 110}, {name: '샐러드', cal: 100}
         ];
 
         // [이하 searchFood, confirmAdd, resetAll 등 모든 로직 유지]
